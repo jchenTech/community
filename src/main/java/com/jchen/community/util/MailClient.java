@@ -12,6 +12,8 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 /**
+ * 发送邮件工具类
+ *
  * @Auther: jchen
  * @Date: 2021/03/29/12:02
  */

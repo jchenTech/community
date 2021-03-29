@@ -10,6 +10,8 @@ import org.thymeleaf.context.Context;
 
 
 /**
+ * 发送邮件测试类
+ *
  * @Auther: jchen
  * @Date: 2021/03/29/12:10
  */
