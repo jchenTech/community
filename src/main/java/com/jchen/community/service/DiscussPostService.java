@@ -1,6 +1,7 @@
 package com.jchen.community.service;
 
 import com.jchen.community.dao.DiscussPostMapper;
+import com.jchen.community.entity.Comment;
 import com.jchen.community.entity.DiscussPost;
 import com.jchen.community.util.SensitiveFilter;
 import org.springframework.beans.factory.annotation.Autowired;
