@@ -2,6 +2,7 @@ package com.jchen.community.controller;
 
 import com.jchen.community.service.AlphaService;
 import com.jchen.community.util.CommunityUtil;
+import javafx.geometry.Pos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Repository;
@@ -186,6 +187,15 @@ public class AlphaController {
         System.out.println(session.getAttribute("id"));
         System.out.println(session.getAttribute("name"));
         return "get session";
+    }
+
+    //ajax示例
+    @RequestMapping(path = "/ajax", method = RequestMethod.POST)
+    @ResponseBody
+    public String testAjax(String name, int age) {
+        System.out.println(name);
+        System.out.println(age);
+        return CommunityUtil.getJSONString(0, "操作成功");
     }
 
 }
