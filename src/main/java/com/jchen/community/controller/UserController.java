@@ -1,5 +1,6 @@
 package com.jchen.community.controller;
 
+import com.jchen.community.annotation.LoginRequired;
 import com.jchen.community.entity.User;
 import com.jchen.community.service.UserService;
 import com.jchen.community.util.CommunityUtil;
@@ -49,11 +50,13 @@ public class UserController {
     @Autowired
     private HostHolder hostHolder;
 
+    @LoginRequired
     @RequestMapping(path = "/setting", method = RequestMethod.GET)
     public String getSettingPage() {
         return "/site/setting";
     }
 
+    @LoginRequired
     @RequestMapping(path = "/upload", method = RequestMethod.POST)
     public String uploadHeader(MultipartFile headerImage, Model model) {
         if (headerImage == null) {

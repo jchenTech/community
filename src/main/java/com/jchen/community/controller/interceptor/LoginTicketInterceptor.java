@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 
 /**
+ * 拦截器检验登录是否有效
  * @Auther: jchen
  * @Date: 2021/03/29/20:21
  */
