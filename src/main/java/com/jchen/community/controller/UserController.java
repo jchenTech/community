@@ -2,6 +2,7 @@ package com.jchen.community.controller;
 
 import com.jchen.community.annotation.LoginRequired;
 import com.jchen.community.entity.User;
+import com.jchen.community.service.LikeService;
 import com.jchen.community.service.UserService;
 import com.jchen.community.util.CommunityUtil;
 import com.jchen.community.util.HostHolder;
@@ -50,6 +51,9 @@ public class UserController {
     @Autowired
     private HostHolder hostHolder;
 
+    @Autowired
+    private LikeService likeService;
+
     @LoginRequired
     @RequestMapping(path = "/setting", method = RequestMethod.GET)
     public String getSettingPage() {
@@ -60,30 +64,31 @@ public class UserController {
     @RequestMapping(path = "/upload", method = RequestMethod.POST)
     public String uploadHeader(MultipartFile headerImage, Model model) {
         if (headerImage == null) {
-            model.addAttribute("erroe", "您还没有选择图片");
+            model.addAttribute("error", "您还没有选择图片!");
             return "/site/setting";
         }
 
         String fileName = headerImage.getOriginalFilename();
         String suffix = fileName.substring(fileName.lastIndexOf("."));
         if (StringUtils.isBlank(suffix)) {
-            model.addAttribute("erroe", "文件的格式不正确！");
+            model.addAttribute("error", "文件的格式不正确!");
             return "/site/setting";
         }
 
-        //生成随机文件名
+        // 生成随机文件名
         fileName = CommunityUtil.generateUUID() + suffix;
-        //确定文件存放的路径
+        // 确定文件存放的路径
         File dest = new File(uploadPath + "/" + fileName);
         try {
+            // 存储文件
             headerImage.transferTo(dest);
         } catch (IOException e) {
-            logger.error("上传文件失败" + e.getMessage());
-            throw new RuntimeException("上传文件失败，服务器发生异常", e);
+            logger.error("上传文件失败: " + e.getMessage());
+            throw new RuntimeException("上传文件失败,服务器发生异常!", e);
         }
 
-        //更新当前用户的头像的路径(web访问路径)
-        //http://localhost:8080/community/user/header/xxx.png
+        // 更新当前用户的头像的路径(web访问路径)
+        // http://localhost:8080/community/user/header/xxx.png
         User user = hostHolder.getUser();
         String headerUrl = domain + contextPath + "/user/header/" + fileName;
         userService.updateHeader(user.getId(), headerUrl);
@@ -113,18 +118,21 @@ public class UserController {
         }
     }
 
-    @RequestMapping(path = "/updatePassword", method = RequestMethod.POST)
-    public String updatePassword(String oldPassword, String newPassword, Model model) {
-        User user = hostHolder.getUser();
-        Map<String, Object> map = userService.updatePassword(user.getId(), oldPassword, newPassword);
-        if (map == null || map.isEmpty()) {
-            return "redirect:/logout";
-        } else {
-            model.addAttribute("oldPasswordMsg", map.get("oldPasswordMsg"));
-            model.addAttribute("newPasswordMsg", map.get("newPasswordMsg"));
-            model.addAttribute("PasswordMsg", map.get("newPasswordMsg"));
-            return "/site/setting";
+    // 个人主页
+    @RequestMapping(path = "/profile/{userId}", method = RequestMethod.GET)
+    public String getProfilePage(@PathVariable("userId") int userId, Model model) {
+        User user = userService.findUserById(userId);
+        if (user == null) {
+            throw new RuntimeException("该用户不存在!");
         }
+
+        // 用户
+        model.addAttribute("user", user);
+        // 点赞数量
+        int likeCount = likeService.findUserLikeCount(userId);
+        model.addAttribute("likeCount", likeCount);
+
+        return "/site/profile";
     }
 
 }
