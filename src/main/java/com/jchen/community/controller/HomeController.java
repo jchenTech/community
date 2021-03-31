@@ -4,7 +4,9 @@ import com.jchen.community.entity.DiscussPost;
 import com.jchen.community.entity.Page;
 import com.jchen.community.entity.User;
 import com.jchen.community.service.DiscussPostService;
+import com.jchen.community.service.LikeService;
 import com.jchen.community.service.UserService;
+import com.jchen.community.util.CommunityConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,17 +25,20 @@ import java.util.Map;
  * @Date: 2021/03/28/14:30
  */
 @Controller
-public class HomeController {
+public class HomeController implements CommunityConstant {
     @Autowired
     private DiscussPostService discussPostService;
 
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private LikeService likeService;
+
     @RequestMapping(path = "/index", method = RequestMethod.GET)
     public String getIndexPage(Model model, Page page) {
-        // 方法调用前，SpringMVC会自动实例化Model和Page，并将Page注入Model
-        // 所以，在thymeleaf中可以直接访问Page对象中的数据
+        // 方法调用钱,SpringMVC会自动实例化Model和Page,并将Page注入Model.
+        // 所以,在thymeleaf中可以直接访问Page对象中的数据.
         page.setRows(discussPostService.findDiscussPostRows(0));
         page.setPath("/index");
 
@@ -45,6 +50,10 @@ public class HomeController {
                 map.put("post", post);
                 User user = userService.findUserById(post.getUserId());
                 map.put("user", user);
+
+                long likeCount = likeService.findEntityLikeCount(ENTITY_TYPE_POST, post.getId());
+                map.put("likeCount", likeCount);
+
                 discussPosts.add(map);
             }
         }
