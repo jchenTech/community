@@ -1,5 +1,10 @@
 package com.jchen.community.entity;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
+
 import java.util.Date;
 
 /**
@@ -8,15 +13,36 @@ import java.util.Date;
  * @Auther: jchen
  * @Date: 2021/03/28/13:58
  */
+//底层自动把实体和elasticsearch的索引映射起来,参数中的type已经被废弃不用设置
+@Document(indexName = "discusspost", shards = 6, replicas = 3)
 public class DiscussPost {
+
+    @Id
     private int id;
+
+    @Field(type = FieldType.Integer)
     private int userId;
+
+    // 比如“互联网校招”（尽可能地把这句话拆分成多个词条，与之匹配，增加搜索的范围,而搜索时用ik_smart分词器，缩小范围较精确地满足需求）
+    @Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_smart")
     private String title;
+
+    @Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_smart")
     private String content;
+
+    @Field(type = FieldType.Integer)
     private int type;
+
+    @Field(type = FieldType.Integer)
     private int status;
+
+    @Field(type = FieldType.Date)
     private Date createTime;
+
+    @Field(type = FieldType.Integer)
     private int commentCount;
+
+    @Field(type = FieldType.Double)
     private double score;
 
     public int getId() {
