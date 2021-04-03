@@ -1,0 +1,51 @@
+package com.jchen.community.config;
+
+import com.jchen.community.quartz.AlphaJob;
+import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.quartz.JobDetailFactoryBean;
+import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
+
+/**
+ * @Auther: jchen
+ * @Date: 2021/04/03/16:11
+ */
+// 配置 -> 数据库 -> 调用，就第一次使用，之后quartz直接访问数据库调用
+@Configuration
+public class QuartzConfig {
+
+    // FactoryBean可简化Bean的实例化过程:
+    // 1.通过FactoryBean封装Bean的实例化过程.
+    // 2.将FactoryBean装配到Spring容器里.
+    // 3.将FactoryBean注入给其他的Bean.
+    // 4.该Bean得到的是FactoryBean所管理的对象实例.
+
+    // 配置JobDetail任务详情
+    // @Bean
+    public JobDetailFactoryBean alphaJobDetail() {
+        JobDetailFactoryBean factoryBean = new JobDetailFactoryBean();
+        factoryBean.setJobClass(AlphaJob.class);//管理的是哪个job
+        factoryBean.setName("alphaJob");
+        factoryBean.setGroup("alphaJobGroup");
+        factoryBean.setDurability(true);//是否长久保存
+        factoryBean.setRequestsRecovery(true);//是否可恢复
+        return factoryBean;
+    }
+
+    // 配置Trigger(SimpleTriggerFactoryBean, CronTriggerFactoryBean) 触发器
+    // @Bean
+    public SimpleTriggerFactoryBean alphaTrigger(JobDetail alphaJobDetail) {
+        //Trigger依赖于JobDetail
+        SimpleTriggerFactoryBean factoryBean = new SimpleTriggerFactoryBean();
+        factoryBean.setJobDetail(alphaJobDetail);//对哪个JobDetail进行设置，spring会优先注入同名的
+        factoryBean.setName("alphaTrigger");
+        factoryBean.setGroup("alphaTriggerGroup");
+        factoryBean.setRepeatInterval(3000);//多长时间执行
+        factoryBean.setJobDataMap(new JobDataMap());//底层要用对象来存，存job的状态
+        return factoryBean;
+    }
+
+    //任务一启动，就自动加载，然后调用
+}
