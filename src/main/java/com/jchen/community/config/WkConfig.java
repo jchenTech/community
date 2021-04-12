@@ -9,6 +9,7 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 
 /**
+ * wkhtmltopdf配置类，配置本地文件目录
  * @Auther: jchen
  * @Date: 2021/04/03/19:06
  */

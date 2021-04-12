@@ -10,6 +10,7 @@ import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
 
 /**
+ * Quartz定时任务配置类
  * @Auther: jchen
  * @Date: 2021/04/03/16:11
  */

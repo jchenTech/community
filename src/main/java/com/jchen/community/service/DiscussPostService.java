@@ -45,7 +45,7 @@ public class DiscussPostService {
 
     // Caffeine核心接口: Cache, LoadingCache, AsyncLoadingCache
 
-    // 帖子列表缓存
+    // 帖子列表缓存,所有的缓存都是按照key缓存value
     private LoadingCache<String, List<DiscussPost>> postListCache;
 
     // 帖子总数缓存
@@ -54,7 +54,7 @@ public class DiscussPostService {
     @PostConstruct
     public void init() {
         // 初始化帖子列表缓存
-        postListCache = Caffeine.newBuilder()
+        postListCache = Caffeine.newBuilder() //先用caffine
                 .maximumSize(maxSize)
                 .expireAfterWrite(expireSeconds, TimeUnit.SECONDS)
                 .build(new CacheLoader<String, List<DiscussPost>>() {
@@ -73,9 +73,10 @@ public class DiscussPostService {
                         int offset = Integer.valueOf(params[0]);
                         int limit = Integer.valueOf(params[1]);
 
-                        // 二级缓存: Redis -> mysql
+                        // 若有二级缓存：二级缓存: Redis -> mysql,而这里是直接就访问数据库了
 
                         logger.debug("load post list from DB.");
+                        //只缓存不针对用户的所有帖子-userId=0，且是“最热”模式-orderMode=1(最新模式-orderMode=0)
                         return discussPostMapper.selectDiscussPosts(0, offset, limit, 1);
                     }
                 });
@@ -93,7 +94,17 @@ public class DiscussPostService {
                 });
     }
 
+    /**
+     * 查询帖子
+     * @param userId
+     * @param offset
+     * @param limit
+     * @param orderMode
+     * @return
+     */
     public List<DiscussPost> findDiscussPosts(int userId, int offset, int limit, int orderMode) {
+        //只有当orderMode=1的时候才使用缓存，也就是只在“最热”模式下使用缓存，并且也只有访问首页才穿，也就是userID=0的时候。
+        //缓存的是一页的数据，而具体是那一页的数据只和int offset,int limit唯一相关，所以key是这两的组合
         if (userId == 0 && orderMode == 1) {
             return postListCache.get(offset + ":" + limit);
         }
@@ -103,6 +114,7 @@ public class DiscussPostService {
     }
 
     public int findDiscussPostRows(int userId) {
+        //要缓存的是帖子列表的总行数，这个是不涉及用户的时候才使用。用户查看自己帖子的时候是不查看缓存的
         if (userId == 0) {
             return postRowsCache.get(userId);
         }
@@ -111,6 +123,11 @@ public class DiscussPostService {
         return discussPostMapper.selectDiscussPostRows(userId);
     }
 
+    /**
+     * 发布帖子，转移HTML标记和过滤敏感词
+     * @param post DiscussPost对象
+     * @return
+     */
     public int addDiscussPost(DiscussPost post) {
         if (post == null) {
             throw new IllegalArgumentException("参数不能为空!");

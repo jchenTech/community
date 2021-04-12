@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.*;
 
 /**
+ * 帖子相关的表现层
  * @Auther: jchen
  * @Date: 2021/03/30/14:20
  */
@@ -50,6 +51,12 @@ public class DiscussPostController implements CommunityConstant {
     @Autowired
     private RedisTemplate redisTemplate;
 
+    /**
+     * 发布帖子，1、调用service层方法过滤敏感词后添加到数据库；2、触发发帖事件；3、计算帖子分数
+     * @param title 文章题目
+     * @param content 文章内容
+     * @return 封装的JSON字符串
+     */
     @RequestMapping(path = "/add", method = RequestMethod.POST)
     @ResponseBody
     public String addDiscussPost(String title, String content) {
@@ -58,6 +65,7 @@ public class DiscussPostController implements CommunityConstant {
             return CommunityUtil.getJSONString(403, "你还没有登录哦!");
         }
 
+        //将帖子添加到数据库中
         DiscussPost post = new DiscussPost();
         post.setUserId(user.getId());
         post.setTitle(title);
@@ -81,6 +89,9 @@ public class DiscussPostController implements CommunityConstant {
         return CommunityUtil.getJSONString(0, "发布成功!");
     }
 
+    /**
+     * 获取帖子详情
+     */
     @RequestMapping(path = "/detail/{discussPostId}", method = RequestMethod.GET)
     public String getDiscussPost(@PathVariable("discussPostId") int discussPostId, Model model, Page page) {
         // 帖子

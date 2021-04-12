@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
 /**
+ * 私信列表（消息）映射接口
  * @Auther: jchen
  * @Date: 2021/03/30/19:55
  */

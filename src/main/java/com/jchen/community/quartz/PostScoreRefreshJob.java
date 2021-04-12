@@ -20,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
+ * Quartz的刷新帖子分数的Job
  * @Auther: jchen
  * @Date: 2021/04/03/17:50
  */
@@ -50,8 +51,15 @@ public class PostScoreRefreshJob implements Job, CommunityConstant {
         }
     }
 
+    /**
+     * 执行任务细节，从Redis中取存在的postId对应的帖子调用refresh计算帖子分数
+     * @param context
+     * @throws JobExecutionException
+     */
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
+        // 只有加精、评论、点赞的文章才需要重新计算帖子分数，我们在这类事件发生时，
+        // 将其postId存入了redis中，因此每次更新时我们都只更新redis中的帖子的分数
         String redisKey = RedisKeyUtil.getPostScoreKey();
         BoundSetOperations operations = redisTemplate.boundSetOps(redisKey);
 
@@ -67,6 +75,11 @@ public class PostScoreRefreshJob implements Job, CommunityConstant {
         logger.info("[任务结束] 帖子分数刷新完毕!");
     }
 
+    /**
+     * 根据公式：log(精华分 + 评论数 * 10 + 点赞数 * 2)+（发布时间 - 牛客纪元）
+     * 重新计算帖子分数
+     * @param postId redis中加精、评论、点赞添加的postId
+     */
     private void refresh(int postId) {
         DiscussPost post = discussPostService.findDiscussPostById(postId);
 

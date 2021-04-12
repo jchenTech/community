@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import java.util.Date;
 
 /**
+ * 评论相关的表现层逻辑
  * @Auther: jchen
  * @Date: 2021/03/30/19:07
  */
@@ -42,6 +43,12 @@ public class CommentController implements CommunityConstant {
     @Autowired
     private RedisTemplate redisTemplate;
 
+    /**
+     * 添加评论，添加到数据库，触发评论事件
+     * @param discussPostId 评论帖子的id
+     * @param comment 评论
+     * @return
+     */
     @RequestMapping(path = "/add/{discussPostId}", method = RequestMethod.POST)
     public String addComment(@PathVariable("discussPostId") int discussPostId, Comment comment) {
         comment.setUserId(hostHolder.getUser().getId());
@@ -67,6 +74,7 @@ public class CommentController implements CommunityConstant {
         }
         eventProducer.fireEvent(event);
 
+        //只有评论给帖子才放到搜索服务器中
         if (comment.getEntityType() == ENTITY_TYPE_POST) {
             // 触发发帖事件
             event = new Event()

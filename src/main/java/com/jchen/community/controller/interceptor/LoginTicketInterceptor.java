@@ -32,6 +32,10 @@ public class LoginTicketInterceptor implements HandlerInterceptor {
     @Autowired
     private HostHolder hostHolder;
 
+    /**
+     * 在请求前查询登录用户，通过hostHolder在本次请求中持有用户数据，并将认证结果存入SecurityContext便于授权
+     * @param request 请求，里面包含ticket数据，便于查询登录凭证从而保存用户数据
+     */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         // 从cookie中获取凭证
@@ -56,6 +60,9 @@ public class LoginTicketInterceptor implements HandlerInterceptor {
         return true;
     }
 
+    /**
+     * 在模板视图上保存用户数据，便于生成动态网页信息
+     */
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
         User user = hostHolder.getUser();
@@ -64,6 +71,9 @@ public class LoginTicketInterceptor implements HandlerInterceptor {
         }
     }
 
+    /**
+     * 请求结束时清理用户数据，清理认证结果
+     */
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
         hostHolder.clear();

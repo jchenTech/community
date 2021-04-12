@@ -13,6 +13,8 @@ import java.util.List;
  */
 @Mapper
 public interface DiscussPostMapper {
+
+    //根据offset和limit选择一页帖子数据
     List<DiscussPost> selectDiscussPosts(int userId, int offset, int limit, int orderMode);
 
     // @Param注解用于给参数取别名,

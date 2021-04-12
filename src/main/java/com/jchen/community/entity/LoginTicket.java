@@ -3,6 +3,7 @@ package com.jchen.community.entity;
 import java.util.Date;
 
 /**
+ * 登陆凭证
  * @Auther: jchen
  * @Date: 2021/03/29/18:13
  */

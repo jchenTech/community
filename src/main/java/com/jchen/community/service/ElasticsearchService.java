@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * 搜索相关业务层逻辑
  * @Auther: jchen
  * @Date: 2021/04/02/11:45
  */
@@ -39,6 +40,7 @@ public class ElasticsearchService {
     @Autowired
     private ElasticsearchTemplate elasticTemplate;
 
+    //保存帖子到es服务器中
     public void saveDiscussPost(DiscussPost post) {
         discussRepository.save(post);
     }
@@ -47,13 +49,23 @@ public class ElasticsearchService {
         discussRepository.deleteById(id);
     }
 
+    /**
+     * 搜索包含关键字的帖子数据，结果分页显示
+     * @param keyword 搜索关键字
+     * @param current 当前行数
+     * @param limit 一页包含的数据
+     * @return 返回的page类型的数据，返回多种类型的数据，这个page是spring提供的数据
+     */
     public Page<DiscussPost> searchDiscussPost(String keyword, int current, int limit) {
         SearchQuery searchQuery = new NativeSearchQueryBuilder()
+                //构造搜索条件
                 .withQuery(QueryBuilders.multiMatchQuery(keyword, "title", "content"))
+                //按照类型、分数、创建时间进行排序
                 .withSort(SortBuilders.fieldSort("type").order(SortOrder.DESC))
                 .withSort(SortBuilders.fieldSort("score").order(SortOrder.DESC))
                 .withSort(SortBuilders.fieldSort("createTime").order(SortOrder.DESC))
                 .withPageable(PageRequest.of(current, limit))
+                //返回结果高亮显示,在前端定义加<em>显示为红色
                 .withHighlightFields(
                         new HighlightBuilder.Field("title").preTags("<em>").postTags("</em>"),
                         new HighlightBuilder.Field("content").preTags("<em>").postTags("</em>")
@@ -67,6 +79,7 @@ public class ElasticsearchService {
                     return null;
                 }
 
+                //构造实例集合，根据命中的数据返回
                 List<DiscussPost> list = new ArrayList<>();
                 for (SearchHit hit : hits) {
                     DiscussPost post = new DiscussPost();
@@ -87,7 +100,7 @@ public class ElasticsearchService {
                     post.setStatus(Integer.valueOf(status));
 
                     String createTime = hit.getSourceAsMap().get("createTime").toString();
-                    post.setCreateTime(new Date(Long.valueOf(createTime)));
+                    post.setCreateTime(new Date(Long.valueOf(createTime))); //es存储日期是用long类型来存的
 
                     String commentCount = hit.getSourceAsMap().get("commentCount").toString();
                     post.setCommentCount(Integer.valueOf(commentCount));
@@ -95,11 +108,13 @@ public class ElasticsearchService {
                     // 处理高亮显示的结果
                     HighlightField titleField = hit.getHighlightFields().get("title");
                     if (titleField != null) {
+                        //覆盖原来的title
                         post.setTitle(titleField.getFragments()[0].toString());
                     }
 
                     HighlightField contentField = hit.getHighlightFields().get("content");
                     if (contentField != null) {
+                        //覆盖原来的content
                         post.setContent(contentField.getFragments()[0].toString());
                     }
 
@@ -108,7 +123,7 @@ public class ElasticsearchService {
 
                 return new AggregatedPageImpl(list, pageable,
                         hits.getTotalHits(), response.getAggregations(), response.getScrollId(), hits.getMaxScore());
-            }
+            } //返回的不是直接的list，是个聚合的数据，不止一个集合-->是AggregatedPage-->要构造这个的实现类,传参可以去看手册
         });
     }
 

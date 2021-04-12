@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
- * login的Controller层
+ * login登录模块的的Controller层
  * @Auther: jchen
  * @Date: 2021/03/29/12:56
  */
@@ -94,6 +94,12 @@ public class LoginController implements CommunityConstant {
         return "/site/operate-result";
     }
 
+    /**
+     * 生成验证码和图片
+     * 1、将验证码归属存入cookie中，响应给客户端，以后每次登陆时，客户端会发送cookie，里面包含验证码归属信息
+     * 2、将验证码存入redis中（验证码归属对应的redisKey，验证码text，过期时间）
+     * 3、将图片输出给浏览器
+     */
     @RequestMapping(path = "/kaptcha", method = RequestMethod.GET)
     public void getKaptcha(HttpServletResponse response/*, HttpSession session*/) {
         // 生成验证码
@@ -111,9 +117,9 @@ public class LoginController implements CommunityConstant {
         response.addCookie(cookie);
         // 将验证码存入Redis
         String redisKey = RedisKeyUtil.getKaptchaKey(kaptchaOwner);
-        redisTemplate.opsForValue().set(redisKey, text, 60, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(redisKey, text, 60, TimeUnit.SECONDS); //过期时间：60s
 
-        // 将突图片输出给浏览器
+        // 将图片输出给浏览器
         response.setContentType("image/png");
         try {
             OutputStream os = response.getOutputStream();
@@ -123,6 +129,17 @@ public class LoginController implements CommunityConstant {
         }
     }
 
+    /**
+     * 登录功能，检查账号密码验证码是否正确。
+     * @param username 输入的用户名
+     * @param password 输入的密码
+     * @param code 客户端输入的验证码
+     * @param rememberme 记住我
+     * @param model
+     * @param response 如果登录正确，向客户端发送ticket登录凭证cookie
+     * @param kaptchaOwner 客户端发送过来的cookie中的验证码归属
+     * @return 如果正确，重定向到首页，如果错误则再次返回登陆页面
+     */
     @RequestMapping(path = "/login", method = RequestMethod.POST)
     public String login(String username, String password, String code, boolean rememberme,
                         Model model, /*HttpSession session, */HttpServletResponse response,
@@ -156,6 +173,11 @@ public class LoginController implements CommunityConstant {
         }
     }
 
+    /**
+     * 退出登录，更新登陆凭证的状态值，重定向到登陆页面
+     * @param ticket Cookie中的ticket字符串
+     * @return 重定向到login登陆页面
+     */
     @RequestMapping(path = "/logout", method = RequestMethod.GET)
     public String logout(@CookieValue("ticket") String ticket) {
         userService.logout((ticket));

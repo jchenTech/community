@@ -3,6 +3,7 @@ package com.jchen.community.entity;
 import java.util.Date;
 
 /**
+ * 私信列表（消息）实体类
  * @Auther: jchen
  * @Date: 2021/03/30/19:54
  */

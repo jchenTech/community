@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
+ * 统计网站数据UV,DAU的拦截器，在Controller之前执行
  * @Auther: jchen
  * @Date: 2021/04/03/14:54
  */

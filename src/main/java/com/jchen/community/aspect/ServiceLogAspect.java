@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
+ * 通过AOP实现统一记录日志
  * @Auther: jchen
  * @Date: 2021/03/30/22:28
  */

@@ -4,15 +4,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 事件实体类
  * @Auther: jchen
  * @Date: 2021/04/01/12:14
  */
 public class Event {
 
+    //事件主题
     private String topic;
+    //用户id
     private int userId;
+    //实体类型
     private int entityType;
+    //实体Id
     private int entityId;
+    //实体用户Id
     private int entityUserId;
     private Map<String, Object> data = new HashMap<>();
 

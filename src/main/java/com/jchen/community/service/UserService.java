@@ -23,7 +23,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
- *
+ * 用户信息相关业务层，包括查询用户，注册，激活，登录，修改密码，更新头像等
  * @Auther: jchen
  * @Date: 2021/03/28/14:23
  */
@@ -60,6 +60,12 @@ public class UserService implements CommunityConstant {
         return user;
     }
 
+    /**
+     * 用户注册，对用户信息进行空值检查，验证账号邮箱是否存在。如果信息合理
+     * 将设置用户信息，添加到数据库中并发送激活邮件。
+     * @param user user对象
+     * @return Map对象，当注册信息异常时，map不为空；当信息正确map为空
+     */
     public Map<String, Object> register(User user) {
         Map<String, Object> map = new HashMap<>();
 
@@ -97,8 +103,8 @@ public class UserService implements CommunityConstant {
         // 注册用户
         user.setSalt(CommunityUtil.generateUUID().substring(0, 5));
         user.setPassword(CommunityUtil.md5(user.getPassword() + user.getSalt()));
-        user.setType(0);
-        user.setStatus(0);
+        user.setType(0); //0-普通用户; 1-超级管理员; 2-版主;
+        user.setStatus(0); //0-未激活; 1-已激活;
         user.setActivationCode(CommunityUtil.generateUUID());
         user.setHeaderUrl(String.format("http://images.nowcoder.com/head/%dt.png", new Random().nextInt(1000)));
         user.setCreateTime(new Date());
@@ -129,6 +135,14 @@ public class UserService implements CommunityConstant {
         }
     }
 
+    /**
+     * 用户登录，对用户信息进行空值检查，验证账号是否存在，状态验证密码是否正确。
+     * 如果信息合理将生成登陆凭证，添加到redis中缓存。
+     * @param username
+     * @param password
+     * @param expiredSeconds
+     * @return 返回Map对象，如果登录正确，则包含ticket信息，否则包含错误信息
+     */
     public Map<String, Object> login(String username, String password, int expiredSeconds) {
         Map<String, Object> map = new HashMap<>();
 
@@ -222,6 +236,11 @@ public class UserService implements CommunityConstant {
         redisTemplate.delete(redisKey);
     }
 
+    /**
+     * 查询用户权限
+     * @param userId 用户id
+     * @return 权限集合
+     */
     public Collection<? extends GrantedAuthority> getAuthorities(int userId) {
         User user = this.findUserById(userId);
 

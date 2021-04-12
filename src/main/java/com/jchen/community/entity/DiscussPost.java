@@ -8,7 +8,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 import java.util.Date;
 
 /**
- * 讨论文章实体类
+ * 讨论文章实体类，将文章也添加到elasticsearch中
  *
  * @Auther: jchen
  * @Date: 2021/03/28/13:58

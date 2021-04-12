@@ -32,6 +32,7 @@ import java.io.OutputStream;
 import java.util.Map;
 
 /**
+ * 用户操作相关表现层逻辑，包含个人主页，上传头像等
  * @Auther: jchen
  * @Date: 2021/03/29/21:33
  */
@@ -77,15 +78,17 @@ public class UserController implements CommunityConstant {
     @LoginRequired
     @RequestMapping(path = "/setting", method = RequestMethod.GET)
     public String getSettingPage(Model model) {
-        // 上传文件名称
+        // 1.上传文件名称
         String fileName = CommunityUtil.generateUUID();
-        // 设置响应信息
+        // 2.设置响应信息
         StringMap policy = new StringMap();
         policy.put("returnBody", CommunityUtil.getJSONString(0));
-        // 生成上传凭证
+        // 3.生成上传凭证
         Auth auth = Auth.create(accessKey, secretKey);
+        //上传的空间名称，上传的文件名，过期时间，设置的响应信息
         String uploadToken = auth.uploadToken(headerBucketName, fileName, 3600, policy);
 
+        //把传回来的信息放到模板中
         model.addAttribute("uploadToken", uploadToken);
         model.addAttribute("fileName", fileName);
 
@@ -101,12 +104,13 @@ public class UserController implements CommunityConstant {
         }
 
         String url = headerBucketUrl + "/" + fileName;
+        //更改头像路径为七牛云服务器url
         userService.updateHeader(hostHolder.getUser().getId(), url);
 
         return CommunityUtil.getJSONString(0);
     }
 
-    // 废弃
+    // 上传到本地（废弃！）
     @LoginRequired
     @RequestMapping(path = "/upload", method = RequestMethod.POST)
     public String uploadHeader(MultipartFile headerImage, Model model) {
@@ -143,7 +147,7 @@ public class UserController implements CommunityConstant {
         return "redirect:/index";
     }
 
-    // 废弃
+    // 从本地获取头像（废弃！）
     @RequestMapping(path = "/header/{fileName}", method = RequestMethod.GET)
     public void getHeader(@PathVariable("fileName") String fileName, HttpServletResponse response) {
         // 服务器存放路径

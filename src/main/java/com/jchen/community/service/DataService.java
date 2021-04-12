@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * 网站数据统计业务层逻辑：UV,DAU
  * @Auther: jchen
  * @Date: 2021/04/03/14:46
  */
@@ -27,13 +28,21 @@ public class DataService {
 
     private SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
 
-    // 将指定的IP计入UV
+    /**
+     * 将指定的IP计入UV
+     * @param ip
+     */
     public void recordUV(String ip) {
         String redisKey = RedisKeyUtil.getUVKey(df.format(new Date()));
         redisTemplate.opsForHyperLogLog().add(redisKey, ip);
     }
 
-    // 统计指定日期范围内的UV
+    /**
+     * 统计指定日期范围内的UV
+     * @param start
+     * @param end
+     * @return
+     */
     public long calculateUV(Date start, Date end) {
         if (start == null || end == null) {
             throw new IllegalArgumentException("参数不能为空!");
@@ -57,13 +66,21 @@ public class DataService {
         return redisTemplate.opsForHyperLogLog().size(redisKey);
     }
 
-    // 将指定用户计入DAU
+    /**
+     * 将指定用户计入DAU
+     * @param userId
+     */
     public void recordDAU(int userId) {
         String redisKey = RedisKeyUtil.getDAUKey(df.format(new Date()));
         redisTemplate.opsForValue().setBit(redisKey, userId, true);
     }
 
-    // 统计指定日期范围内的DAU
+    /**
+     * 统计指定日期范围内的DAU
+     * @param start
+     * @param end
+     * @return
+     */
     public long calculateDAU(Date start, Date end) {
         if (start == null || end == null) {
             throw new IllegalArgumentException("参数不能为空!");

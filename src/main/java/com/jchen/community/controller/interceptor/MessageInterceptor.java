@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
+ * 通知拦截器，在handle之后更新首页显示的未读消息数
  * @Auther: jchen
  * @Date: 2021/04/01/14:28
  */

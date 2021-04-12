@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 搜索相关表现层逻辑
  * @Auther: jchen
  * @Date: 2021/04/02/12:01
  */
@@ -37,6 +38,7 @@ public class SearchController implements CommunityConstant {
     @RequestMapping(path = "/search", method = RequestMethod.GET)
     public String search(String keyword, Page page, Model model) {
         // 搜索帖子
+        //搜索得到的Page对象和我们自己设置的分页Page对象冲突了，这里需要带上包名
         org.springframework.data.domain.Page<DiscussPost> searchResult =
                 elasticsearchService.searchDiscussPost(keyword, page.getCurrent() - 1, page.getLimit());
         // 聚合数据

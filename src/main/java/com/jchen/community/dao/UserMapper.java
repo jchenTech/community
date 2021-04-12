@@ -4,7 +4,7 @@ import com.jchen.community.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
- * mapper映射接口
+ * 用户mapper映射接口
  *
  * @Auther: jchen
  * @Date: 2021/03/28/12:08

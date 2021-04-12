@@ -6,6 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 自定义注解，用于拦截器进行登录状态检查
  * @Auther: jchen
  * @Date: 2021/03/30/10:04
  */

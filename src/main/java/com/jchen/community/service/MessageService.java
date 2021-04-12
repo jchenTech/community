@@ -10,6 +10,7 @@ import org.springframework.web.util.HtmlUtils;
 import java.util.List;
 
 /**
+ * 消息列表业务层逻辑
  * @Auther: jchen
  * @Date: 2021/03/30/20:07
  */

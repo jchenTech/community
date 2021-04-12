@@ -3,6 +3,7 @@ package com.jchen.community.util;
 import javax.swing.text.html.parser.Entity;
 
 /**
+ * Redis工具类，生成想要的Redis的key字符串
  * @Auther: jchen
  * @Date: 2021/03/31/11:16
  */

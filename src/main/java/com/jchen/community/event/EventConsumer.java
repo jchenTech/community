@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.concurrent.Future;
 
 /**
+ * 事件的消费者，监听topic主题。获取event对象
  * @Auther: jchen
  * @Date: 2021/04/01/12:21
  */
@@ -117,6 +118,7 @@ public class EventConsumer implements CommunityConstant {
             return;
         }
 
+        //发帖时需要将帖子存入elasticsearch服务器
         DiscussPost post = discussPostService.findDiscussPostById(event.getEntityId());
         elasticsearchService.saveDiscussPost(post);
     }
@@ -135,6 +137,7 @@ public class EventConsumer implements CommunityConstant {
             return;
         }
 
+        //删帖时，删除es中的帖子
         elasticsearchService.deleteDiscussPost(event.getEntityId());
     }
 

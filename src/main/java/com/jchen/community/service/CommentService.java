@@ -14,6 +14,7 @@ import org.springframework.web.util.HtmlUtils;
 import java.util.List;
 
 /**
+ * 帖子评论业务层逻辑
  * @Auther: jchen
  * @Date: 2021/03/30/16:37
  */
@@ -37,6 +38,11 @@ public class CommentService implements CommunityConstant {
         return commentMapper.selectCountByEntity(entityType, entityId);
     }
 
+    /**
+     * 添加评论和更新帖子评论数量应该为一个事务，保证事务隔离性，使用声明式事务
+     * @param comment 评论
+     * @return
+     */
     @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
     public int addComment(Comment comment) {
         if (comment == null) {

@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 点赞相关的表现层逻辑
  * @Auther: jchen
  * @Date: 2021/03/31/11:30
  */

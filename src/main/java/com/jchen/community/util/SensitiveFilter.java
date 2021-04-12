@@ -30,23 +30,30 @@ public class SensitiveFilter {
     //根节点
     private TrieNode rootNode = new TrieNode();
 
+    /**
+     * 添加@PostConstruct注解使其在构造方法之后，init方法之前执行。
+     * 读入本地的敏感词文件，将敏感词添加到前缀树中
+     */
     @PostConstruct
     public void init() {
         try (
                 InputStream is = this.getClass().getClassLoader().getResourceAsStream("sensitive-words.txt");
                 BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         ) {
-            String ketword;
-            while ((ketword = reader.readLine()) != null) {
+            String keyword;
+            while ((keyword = reader.readLine()) != null) {
                 //添加到前缀树
-                this.addKeyword(ketword);
+                this.addKeyword(keyword);
             }
         } catch (IOException e) {
             logger.error("加载敏感词文件失败：" + e.getMessage());
         }
     }
 
-    //将一个敏感词添加到前缀树中
+    /**
+     * 将一个敏感词添加到前缀树中
+     * @param keyword 敏感词字符串
+     */
     private void addKeyword(String keyword) {
         TrieNode tempNode = rootNode;
         for (int i = 0; i < keyword.length(); i++) {
@@ -70,7 +77,9 @@ public class SensitiveFilter {
     }
 
     /**
-     * 过滤敏感词
+     * 过滤敏感词，使用begin指针和position指针
+     * begin指针为前缀树中的根节点的叶子节点时，说明此字符是敏感词的首字符，
+     * position向后扫描，当isKeywordEnd为true，即begin-position为敏感词。
      * @param text 待过滤的文本
      * @return 过滤后的文本
      */
@@ -80,9 +89,9 @@ public class SensitiveFilter {
         }
         //指针1
         TrieNode tempNode = rootNode;
-        //指针2
+        //指针2，用于定位敏感词开头字符
         int begin = 0;
-        //指针3
+        //指针3，当前文本字符指针位置，当begin-position范围内为敏感词时进行过滤
         int position = 0;
         //结果
         StringBuilder sb = new StringBuilder();
@@ -130,14 +139,18 @@ public class SensitiveFilter {
         return sb.toString();
     }
 
-    //判断是否为符号
+    /**
+     * 判断是否为符号
+     */
     private Boolean isSymbol(Character c) {
         //c < 0x2E80 || c > 0x9FFF是东亚文字范围
         return !CharUtils.isAsciiAlphanumeric(c) && (c < 0x2E80 || c > 0x9FFF);
     }
 
 
-    //前缀树
+    /**
+     * 前缀树，只在过滤敏感词中使用，因此定义为一个内部类
+     */
     private class TrieNode {
         //关键词结束标识
         private boolean isKeywordEnd = false;

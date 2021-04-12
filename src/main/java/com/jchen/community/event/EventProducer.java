@@ -7,6 +7,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 /**
+ * 事件的生产者，将事件发布到指定主题
  * @Auther: jchen
  * @Date: 2021/04/01/12:19
  */

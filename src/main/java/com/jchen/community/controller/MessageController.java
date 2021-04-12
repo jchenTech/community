@@ -21,6 +21,7 @@ import org.springframework.web.util.HtmlUtils;
 import java.util.*;
 
 /**
+ * 消息列表的表现层逻辑
  * @Auther: jchen
  * @Date: 2021/03/30/20:08
  */
@@ -153,6 +154,11 @@ public class MessageController implements CommunityConstant {
         return CommunityUtil.getJSONString(0);
     }
 
+    /**
+     * 获取消息列表，包含评论类通知，点赞类通知，关注类通知，查询未读消息数量
+     * @param model
+     * @return
+     */
     @RequestMapping(path = "/notice/list", method = RequestMethod.GET)
     public String getNoticeList(Model model) {
         User user = hostHolder.getUser();
@@ -234,6 +240,13 @@ public class MessageController implements CommunityConstant {
         return "/site/notice";
     }
 
+    /**
+     * 分页获取通知详情，
+     * @param topic
+     * @param page
+     * @param model
+     * @return
+     */
     @RequestMapping(path = "/notice/detail/{topic}", method = RequestMethod.GET)
     public String getNoticeDetail(@PathVariable("topic") String topic, Page page, Model model) {
         User user = hostHolder.getUser();

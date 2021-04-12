@@ -10,21 +10,27 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * 生成随机字符串和密码加密功能
+ * 工具类提供一些工具方法，如：生成随机字符串和密码加密，封装成JSON字符串
  *
  * @Auther: jchen
  * @Date: 2021/03/29/13:06
  */
 public class CommunityUtil {
 
-    //生成随机字符串
+    /**
+     * 生成随机字符串，去掉"-"，只保留字符
+     */
     public static String generateUUID() {
         return UUID.randomUUID().toString().replaceAll("-", "");
     }
 
-    //MD5加密
-    //hello -> abc123456
-    // hello + 3e4a8 -> abc123def456abc
+    /**
+     * MD5加密
+     * hello -> abc123456(还是太简单)
+     * hello + 3e4a8 -> abc123def456abc(加盐salt)
+     * @param key 待加密字符串
+     * @return
+     */
     public static String md5(String key) {
         if (StringUtils.isBlank(key)) {
             return null;

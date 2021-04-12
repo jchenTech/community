@@ -18,17 +18,31 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 /**
+ * Security配置类
  * @Auther: jchen
  * @Date: 2021/04/02/16:18
  */
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter implements CommunityConstant {
 
+    /**
+     * 重写configure方法1：忽略对静态资源的访问，
+     * 因为我们不用对静态资源进行拦截和认证，用户可以随时访问
+     * @param web
+     * @throws Exception
+     */
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers("/resources/**");
     }
 
+    /**
+     * 通过http.xxx()进行登录设置、推出配置、授权配置、处理验证码、处理RememberMe等等
+     * 如果登陆成功则重定向到首页，如果失败将请求转发到登陆页面，注意这里不能重定向，因为重定向的方式没办法携带request
+     * 授权时，对USER和ADMIN和MODERATOR对于不同页面进行权限分配
+     * @param http
+     * @throws Exception
+     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         // 授权
@@ -44,6 +58,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements Comm
                         "/follow",
                         "/unfollow"
                 )
+                //以上路径需要有hasAnyAuthority中的权限才能访问
                 .hasAnyAuthority(
                         AUTHORITY_USER,
                         AUTHORITY_ADMIN,
@@ -90,11 +105,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements Comm
                     @Override
                     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException e) throws IOException, ServletException {
                         String xRequestedWith = request.getHeader("x-requested-with");
+                        //异步请求
                         if ("XMLHttpRequest".equals(xRequestedWith)) {
                             response.setContentType("application/plain;charset=utf-8");
                             PrintWriter writer = response.getWriter();
                             writer.write(CommunityUtil.getJSONString(403, "你没有访问此功能的权限!"));
                         } else {
+                            //非异步请求就直接重定向去权限不足的页面
                             response.sendRedirect(request.getContextPath() + "/denied");
                         }
                     }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class HostHolder {
 
+    //在存储用户信息的时候需要考虑多线程的情况，不然会在并发的时候产生冲突，必须考虑线程隔离
     private ThreadLocal<User> users = new ThreadLocal<>();
 
     public void setUser(User user) {

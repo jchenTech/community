@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import java.util.Properties;
 
 /**
- * Kaptcha配置类
+ * Kaptcha配置类，设置验证码属性
  *
  * @Auther: jchen
  * @Date: 2021/03/29/16:29

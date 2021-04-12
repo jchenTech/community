@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 /**
+ * 关注相关业务层逻辑
  * @Auther: jchen
  * @Date: 2021/03/31/14:44
  */
@@ -29,19 +30,20 @@ public class FollowService implements CommunityConstant {
         redisTemplate.execute(new SessionCallback() {
             @Override
             public Object execute(RedisOperations operations) throws DataAccessException {
-                String followeeKey = RedisKeyUtil.getFolloweeKey(userId, entityType);
-                String followerKey = RedisKeyUtil.getFollowerKey(entityType, entityId);
+                String followeeKey = RedisKeyUtil.getFolloweeKey(userId, entityType);//关注者
+                String followerKey = RedisKeyUtil.getFollowerKey(entityType, entityId);//被关注者
 
                 operations.multi();
 
-                operations.opsForZSet().add(followeeKey, entityId, System.currentTimeMillis());
-                operations.opsForZSet().add(followerKey, userId, System.currentTimeMillis());
+                operations.opsForZSet().add(followeeKey, entityId, System.currentTimeMillis());//（关注者，关注的实体Id，当前时间）
+                operations.opsForZSet().add(followerKey, userId, System.currentTimeMillis());//（被关注者，关注的用户，当前时间）
 
                 return operations.exec();
             }
         });
     }
 
+    //取消关注
     public void unfollow(int userId, int entityType, int entityId) {
         redisTemplate.execute(new SessionCallback() {
             @Override
