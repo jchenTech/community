@@ -3,7 +3,7 @@
 本项目是一个基于SpringBoot的社区平台，实现了邮箱注册、验证码登录、发帖、评论、私信、点赞、关注、统计网站访问次数等功能，数据库使用MySQL、Redis，使用Kafka构建系统通知，使用Elasticsearch构建全文搜索功能，使用前缀树实现敏感词过滤，同时实现生成pdf文件，网站UV和DAU统计，并将用户头像等信息存于七牛云服务器。
 
 ## 技术架构图
-
+图片源自：https://github.com/wao3/flow
 ![架构图](https://camo.githubusercontent.com/b0a45b5d72948f755b33c110c2ddef8575869ec0dfa18b94e715210660bf095d/68747470733a2f2f692e6c6f6c692e6e65742f323032312f30332f31342f436d714b57347058556a39464e5a332e706e67)
 
 
